@@ -33,10 +33,26 @@ Bot Discord che assegna e rimuove automaticamente un ruolo agli utenti in base a
 ## Avvio locale
 - Con Bun:
   ```sh
-  bun bot.ts
+  bun src/index.ts
   ```
 - Con Node.js (dopo build):
   ```sh
   bun build bot.ts --outdir dist --target node
   node dist/bot.js
   ```
+
+## Deploy su Render.com
+1. Carica il progetto su GitHub/GitLab
+2. Crea un nuovo servizio su Render come **Background Worker**
+3. Imposta le variabili d'ambiente (`DISCORD_TOKEN`, `GUILD_ID`, `ROLE_ID`)
+4. Build command:
+   - `bun install && bun build bot.ts --outdir dist --target node`
+5. Start command:
+   - `node dist/bot.js`
+
+## Note
+- Non caricare mai il file `.env` su GitHub!
+- Il bot non risponde ai comandi, lavora solo sugli eventi di aggiornamento membri.
+
+## Licenza
+MIT
