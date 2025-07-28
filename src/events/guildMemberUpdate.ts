@@ -12,7 +12,34 @@ export const handleGuildMemberUpdate = async (data: any, client: Client): Promis
 
   const userClan = data.user?.primary_guild;
   console.log(`User ${data.user.id} has clan: ${userClan ? userClan.tag : "No clan"}`);
-  
+
+  // Se il clan è null o "nessuno", togli SEMPRE il ruolo
+  if (!userClan || !userClan.tag || userClan.tag.toLowerCase() === 'nessuno') {
+    const guild = client.guilds.cache.get(data.guild_id);
+    if (!guild) {
+      console.log(`Guild ${data.guild_id} not found.`);
+      return;
+    }
+    let member = guild.members.cache.get(data.user.id);
+    if (!member) {
+      try {
+        member = await guild.members.fetch(data.user.id);
+      } catch (error) {
+        console.error('Member not found in guild');
+        return;
+      }
+    }
+    if (process.env.ROLE_ID && member.roles.cache.has(process.env.ROLE_ID)) {
+      try {
+        await member.roles.remove(process.env.ROLE_ID);
+        console.log(`Role ${process.env.ROLE_ID} removed from ${member.user.username} (no clan/null/nessuno)`);
+      } catch (error) {
+        console.error('Failed to remove role:', error);
+      }
+    }
+    return;
+  }
+
   const shouldHavePerks = userClan?.identity_guild_id === process.env.GUILD_ID;
   console.log(`User ${data.user.id} should have perks: ${shouldHavePerks}`);
 
